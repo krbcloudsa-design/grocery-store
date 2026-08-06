@@ -13,7 +13,7 @@ export function Header({
   onOpenCart: () => void;
   onOpenOrders: () => void;
 }) {
-  const { cartCount, breakdown, connection, lastSyncAt, profile, orders } = useStore();
+  const { cartCount, breakdown, connection, lastSyncAt, profile, orders, products } = useStore();
 
   return (
     <header className="sticky top-0 z-30">
@@ -62,9 +62,13 @@ export function Header({
           <div className="relative grow">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-clay-600" />
             <input
+              id="fc-search"
+              name="search"
+              type="search"
+              aria-label="Search products"
               value={query}
               onChange={(event) => onQueryChange(event.target.value)}
-              placeholder="Search 44 products — try “sourdough”, “organic” or “pasta”"
+              placeholder={`Search ${products.length || ''} products — try “sourdough”, “organic” or “pasta”`}
               className="w-full rounded-xl border border-clay-200 bg-clay-50 py-2.5 pl-9 pr-9 text-sm outline-none transition placeholder:text-clay-600/70 focus:border-leaf-400 focus:bg-white focus:ring-2 focus:ring-leaf-200"
             />
             {query && (

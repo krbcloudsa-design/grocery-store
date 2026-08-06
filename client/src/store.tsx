@@ -277,7 +277,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => {
       closed = true;
       if (retry) window.clearTimeout(retry);
-      socket?.close();
+      if (!socket) return;
+      socket.onclose = null;
+      // Closing a still-connecting socket logs a warning, so wait for the handshake.
+      if (socket.readyState === WebSocket.CONNECTING) {
+        const pending = socket;
+        pending.addEventListener('open', () => pending.close());
+      } else {
+        socket.close();
+      }
     };
   }, [productById, pushToast]);
 

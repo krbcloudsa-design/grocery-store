@@ -22,7 +22,7 @@ const SORTS: { id: Sort; label: string }[] = [
 ];
 
 export default function App() {
-  const { ready, products, categories, stock, recommendations, profile, cart } = useStore();
+  const { ready, products, categories, stock, recommendations, profile } = useStore();
 
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<CategoryId | null>(null);
@@ -165,6 +165,7 @@ export default function App() {
               <label className="flex cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-medium ring-1 ring-clay-200">
                 <input
                   type="checkbox"
+                  name="in-stock-only"
                   checked={inStockOnly}
                   onChange={(event) => setInStockOnly(event.target.checked)}
                   className="h-3.5 w-3.5 accent-leaf-600"
@@ -172,6 +173,8 @@ export default function App() {
                 In stock only
               </label>
               <select
+                name="sort"
+                aria-label="Sort products"
                 value={sort}
                 onChange={(event) => setSort(event.target.value as Sort)}
                 className="rounded-xl bg-white px-3 py-2 text-xs font-medium ring-1 ring-clay-200 outline-none focus:ring-2 focus:ring-leaf-200"
@@ -229,7 +232,8 @@ export default function App() {
 
       <OrdersDrawer open={ordersOpen} onClose={() => setOrdersOpen(false)} />
 
-      {checkoutOpen && cart.length > 0 && (
+      {/* Kept mounted after the basket empties so the confirmation screen survives. */}
+      {checkoutOpen && (
         <CheckoutModal
           open={checkoutOpen}
           onClose={() => setCheckoutOpen(false)}

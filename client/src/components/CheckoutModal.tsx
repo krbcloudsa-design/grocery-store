@@ -65,7 +65,11 @@ export function CheckoutModal({
     (async () => {
       try {
         const response = await api.createIntent({ cart, tip, promoCode, deliverySlot });
-        if (cancelled) return;
+        // The panel closed (or remounted) mid-request: drop the hold we just took.
+        if (cancelled) {
+          void api.cancelIntent(response.intent.id);
+          return;
+        }
         setIntent(response.intent);
         setStage('collect');
       } catch (caught) {
@@ -270,7 +274,13 @@ export function CheckoutModal({
             )}
 
             {stage === 'collect' && intent && (
-              <>
+              <form
+                className="space-y-4"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  void pay();
+                }}
+              >
                 <div className="flex items-center justify-between rounded-2xl bg-leaf-50 px-4 py-2.5 ring-1 ring-leaf-200">
                   <p className="flex items-center gap-2 text-xs font-semibold text-leaf-900">
                     <Timer className="h-4 w-4" /> Items held for you
@@ -316,9 +326,11 @@ export function CheckoutModal({
 
                 {method === 'card' && (
                   <div className="space-y-3">
-                    <Field label="Card number" error={fieldError('number')}>
+                    <Field label="Card number" htmlFor="cc-number" error={fieldError('number')}>
                       <div className="relative">
                         <input
+                          id="cc-number"
+                          name="cardnumber"
                           inputMode="numeric"
                           autoComplete="cc-number"
                           value={card.number}
@@ -335,8 +347,10 @@ export function CheckoutModal({
                     </Field>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <Field label="Expiry" error={fieldError('expiry')}>
+                      <Field label="Expiry" htmlFor="cc-exp" error={fieldError('expiry')}>
                         <input
+                          id="cc-exp"
+                          name="cc-exp"
                           inputMode="numeric"
                           autoComplete="cc-exp"
                           value={card.expiry}
@@ -347,8 +361,10 @@ export function CheckoutModal({
                           className={inputClass(fieldError('expiry'))}
                         />
                       </Field>
-                      <Field label="Security code" error={fieldError('cvc')}>
+                      <Field label="Security code" htmlFor="cc-csc" error={fieldError('cvc')}>
                         <input
+                          id="cc-csc"
+                          name="cvc"
                           inputMode="numeric"
                           autoComplete="cc-csc"
                           value={card.cvc}
@@ -364,8 +380,10 @@ export function CheckoutModal({
                       </Field>
                     </div>
 
-                    <Field label="Name on card" error={fieldError('name')}>
+                    <Field label="Name on card" htmlFor="cc-name" error={fieldError('name')}>
                       <input
+                        id="cc-name"
+                        name="ccname"
                         autoComplete="cc-name"
                         value={card.name}
                         onChange={(event) => setCard((current) => ({ ...current, name: event.target.value }))}
@@ -404,8 +422,11 @@ export function CheckoutModal({
                 )}
 
                 {method === 'upi' && (
-                  <Field label="UPI ID" error={fieldError('vpa')}>
+                  <Field label="UPI ID" htmlFor="upi-vpa" error={fieldError('vpa')}>
                     <input
+                      id="upi-vpa"
+                      name="vpa"
+                      autoComplete="off"
                       value={vpa}
                       onChange={(event) => setVpa(event.target.value)}
                       placeholder="aanya@okbank"
@@ -437,8 +458,7 @@ export function CheckoutModal({
                 )}
 
                 <button
-                  type="button"
-                  onClick={pay}
+                  type="submit"
                   disabled={busy || holdRemaining <= 0}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-leaf-600 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-leaf-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
@@ -456,11 +476,17 @@ export function CheckoutModal({
                 <p className="flex items-center justify-center gap-1.5 text-[11px] text-clay-600">
                   <Shield className="h-3.5 w-3.5" /> Simulated gateway — no real card is ever charged
                 </p>
-              </>
+              </form>
             )}
 
             {stage === 'authenticating' && intent && (
-              <div className="space-y-4">
+              <form
+                className="space-y-4"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  void authenticate();
+                }}
+              >
                 <div className="rounded-2xl bg-sky-50 p-4 ring-1 ring-sky-200">
                   <p className="flex items-center gap-2 text-sm font-bold text-sky-900">
                     <Shield className="h-4 w-4" /> Your bank needs to check it is you
@@ -471,9 +497,12 @@ export function CheckoutModal({
                   </p>
                 </div>
 
-                <Field label="One-time code" error={fieldError('otp')}>
+                <Field label="One-time code" htmlFor="otp" error={fieldError('otp')}>
                   <input
+                    id="otp"
+                    name="otp"
                     inputMode="numeric"
+                    autoComplete="one-time-code"
                     value={otp}
                     onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="••••••"
@@ -482,15 +511,14 @@ export function CheckoutModal({
                 </Field>
 
                 <button
-                  type="button"
-                  onClick={authenticate}
+                  type="submit"
                   disabled={busy || otp.length < 6}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-leaf-600 py-3 text-sm font-bold text-white transition hover:bg-leaf-700 disabled:opacity-60"
                 >
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <BadgeCheck className="h-4 w-4" />}
                   {busy ? 'Verifying…' : 'Verify and pay'}
                 </button>
-              </div>
+              </form>
             )}
 
             {stage === 'done' && order && (
@@ -620,19 +648,23 @@ function inputClass(error: string | null): string {
 
 function Field({
   label,
+  htmlFor,
   error,
   children,
 }: {
   label: string;
+  htmlFor: string;
   error: string | null;
   children: React.ReactNode;
 }) {
   return (
-    <label className="block">
-      <span className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-clay-600">{label}</span>
+    <div>
+      <label htmlFor={htmlFor} className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-clay-600">
+        {label}
+      </label>
       {children}
-      {error && <span className="mt-1 block text-[11px] font-medium text-rose-600">{error}</span>}
-    </label>
+      {error && <p className="mt-1 text-[11px] font-medium text-rose-600">{error}</p>}
+    </div>
   );
 }
 

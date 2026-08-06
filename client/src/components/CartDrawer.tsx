@@ -236,6 +236,9 @@ export function CartDrawer({
               <>
                 <div className="flex gap-2">
                   <input
+                    id="promo-code"
+                    name="promo-code"
+                    aria-label="Promo code"
                     value={promoInput}
                     onChange={(event) => setPromoInput(event.target.value.toUpperCase())}
                     placeholder="Enter code"
@@ -272,8 +275,12 @@ export function CartDrawer({
           </section>
 
           <section className="space-y-2 rounded-2xl bg-white p-3 ring-1 ring-clay-200">
-            <h3 className="text-xs font-bold uppercase tracking-wide text-clay-600">Delivery slot</h3>
+            <label htmlFor="delivery-slot" className="block text-xs font-bold uppercase tracking-wide text-clay-600">
+              Delivery slot
+            </label>
             <select
+              id="delivery-slot"
+              name="delivery-slot"
               value={deliverySlot}
               onChange={(event) => setDeliverySlot(event.target.value)}
               className="w-full rounded-xl border border-clay-200 bg-clay-50 px-3 py-2 text-xs font-medium outline-none focus:border-leaf-400 focus:bg-white"
