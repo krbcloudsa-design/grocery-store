@@ -15,7 +15,7 @@ export function ProductCard({
   reason?: string;
   compact?: boolean;
 }) {
-  const { stock, flashed, quantityOf, setQuantity, addToCart } = useStore();
+  const { stock, flashed, quantityOf, adjustQuantity, addToCart } = useStore();
   const level = stock.get(product.id);
   const quantity = quantityOf(product.id);
   const soldOut = level?.status === 'out_of_stock';
@@ -99,7 +99,7 @@ export function ProductCard({
               <button
                 type="button"
                 aria-label={`Remove one ${product.name}`}
-                onClick={() => setQuantity(product.id, quantity - 1)}
+                onClick={() => adjustQuantity(product.id, -1)}
                 className="rounded-lg p-1 transition hover:bg-leaf-700"
               >
                 <Minus className="h-3.5 w-3.5" />
@@ -109,7 +109,7 @@ export function ProductCard({
                 type="button"
                 aria-label={`Add one ${product.name}`}
                 disabled={atLimit}
-                onClick={() => setQuantity(product.id, quantity + 1)}
+                onClick={() => adjustQuantity(product.id, 1)}
                 className="rounded-lg p-1 transition hover:bg-leaf-700 disabled:opacity-40"
               >
                 <Plus className="h-3.5 w-3.5" />

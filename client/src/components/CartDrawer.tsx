@@ -21,7 +21,7 @@ export function CartDrawer({
     cartCount,
     productById,
     stock,
-    setQuantity,
+    adjustQuantity,
     clearCart,
     breakdown,
     tip,
@@ -145,7 +145,7 @@ export function CartDrawer({
                         <button
                           type="button"
                           aria-label={`Remove one ${product.name}`}
-                          onClick={() => setQuantity(line.productId, line.quantity - 1)}
+                          onClick={() => adjustQuantity(line.productId, -1)}
                           className="rounded-lg p-1 text-clay-700 transition hover:bg-white"
                         >
                           {line.quantity === 1 ? <Trash2 className="h-3.5 w-3.5" /> : <Minus className="h-3.5 w-3.5" />}
@@ -155,7 +155,7 @@ export function CartDrawer({
                           type="button"
                           aria-label={`Add one ${product.name}`}
                           disabled={line.quantity >= remaining}
-                          onClick={() => setQuantity(line.productId, line.quantity + 1)}
+                          onClick={() => adjustQuantity(line.productId, 1)}
                           className="rounded-lg p-1 text-clay-700 transition hover:bg-white disabled:opacity-40"
                         >
                           <Plus className="h-3.5 w-3.5" />

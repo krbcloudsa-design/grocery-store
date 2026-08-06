@@ -52,6 +52,7 @@ interface StoreValue {
   cartCount: number;
   quantityOf: (productId: string) => number;
   addToCart: (productId: string, quantity?: number) => void;
+  adjustQuantity: (productId: string, delta: number) => void;
   setQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   reorder: (order: Order) => void;
@@ -136,6 +137,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const productById = useMemo(() => new Map(products.map((product) => [product.id, product])), [products]);
   const cartRef = useRef(cart);
   cartRef.current = cart;
+  const stockRef = useRef(stock);
+  stockRef.current = stock;
 
   const pushToast = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = nextId();
@@ -337,30 +340,53 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [cart],
   );
 
+  const warnIfCapped = useCallback(
+    (wanted: number, available: number) => {
+      if (wanted <= available) return;
+      pushToast({
+        tone: 'warning',
+        title: available === 0 ? 'That item just sold out' : `Only ${available} available right now`,
+        body: 'Live stock limits how many you can add.',
+      });
+    },
+    [pushToast],
+  );
+
   const setQuantity = useCallback(
     (productId: string, quantity: number) => {
-      const available = stock.get(productId)?.available ?? 0;
+      const available = stockRef.current.get(productId)?.available ?? 0;
       const capped = Math.max(0, Math.min(quantity, available));
       setCart((current) => {
         const without = current.filter((line) => line.productId !== productId);
         return capped === 0 ? without : [...without, { productId, quantity: capped }];
       });
-      if (quantity > available) {
-        pushToast({
-          tone: 'warning',
-          title: available === 0 ? 'That item just sold out' : `Only ${available} available right now`,
-          body: 'Live stock limits how many you can add.',
-        });
-      }
+      warnIfCapped(quantity, available);
     },
-    [pushToast, stock],
+    [warnIfCapped],
+  );
+
+  /**
+   * Relative change applied inside the state updater, so several clicks in the
+   * same tick each land instead of racing on a quantity read at render time.
+   */
+  const adjustQuantity = useCallback(
+    (productId: string, delta: number) => {
+      const available = stockRef.current.get(productId)?.available ?? 0;
+      setCart((current) => {
+        const existing = current.find((line) => line.productId === productId)?.quantity ?? 0;
+        const next = Math.max(0, Math.min(existing + delta, available));
+        if (next === existing) return current;
+        const without = current.filter((line) => line.productId !== productId);
+        return next === 0 ? without : [...without, { productId, quantity: next }];
+      });
+      warnIfCapped((cartRef.current.find((line) => line.productId === productId)?.quantity ?? 0) + delta, available);
+    },
+    [warnIfCapped],
   );
 
   const addToCart = useCallback(
-    (productId: string, quantity = 1) => {
-      setQuantity(productId, quantityOf(productId) + quantity);
-    },
-    [quantityOf, setQuantity],
+    (productId: string, quantity = 1) => adjustQuantity(productId, quantity),
+    [adjustQuantity],
   );
 
   const clearCart = useCallback(() => setCart([]), []);
@@ -463,6 +489,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     cartCount,
     quantityOf,
     addToCart,
+    adjustQuantity,
     setQuantity,
     clearCart,
     reorder,
