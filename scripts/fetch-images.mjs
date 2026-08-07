@@ -5,9 +5,13 @@
  *
  * Run: npm run fetch-images
  */
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { access, copyFile, mkdir, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { dirname, join } from "node:path";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+
+const execFileAsync = promisify(execFile);
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const productsDir = join(root, "public/products");
@@ -19,6 +23,11 @@ const aiProducts = new Set([
   "onion-nashik",
   "tomato-hybrid",
   "potato-jyoti",
+  "ginger",
+  "garlic",
+  "garlic-peeled",
+  "coriander-leaves",
+  "palak",
   "green-chilli",
   "chicken-curry-cut",
   "chicken-boneless",
@@ -51,10 +60,6 @@ const aiCategories = new Set(["vegetables", "chicken-poultry", "seafood"]);
 
 /** Verified Pexels ids for remaining SKUs — each depicts the named item. */
 const pexelsProducts = {
-  "ginger": 6157020,
-  "garlic-peeled": 4207909,
-  "coriander-leaves": 4198719,
-  "palak": 4750383,
   "capsicum-green": 1435901,
   "cauliflower": 1300975,
   "bottle-gourd": 1435904,
@@ -110,20 +115,40 @@ async function downloadPexels(targetPath, id, w, h) {
   return buf.length;
 }
 
+async function copyAiAsset(id, destDir) {
+  const dest = join(destDir, `${id}.jpg`);
+  for (const ext of ["jpg", "png"]) {
+    const src = join(assetsDir, `${id}.${ext}`);
+    try {
+      await access(src);
+      if (ext === "jpg") {
+        await copyFile(src, dest);
+      } else {
+        await execFileAsync("ffmpeg", ["-y", "-i", src, "-q:v", "2", dest], { stdio: "ignore" });
+      }
+      return true;
+    } catch {
+      // try next extension
+    }
+  }
+  return false;
+}
+
 await mkdir(productsDir, { recursive: true });
 await mkdir(categoriesDir, { recursive: true });
 
 const failures = [];
 
 for (const id of aiProducts) {
-  const src = join(assetsDir, `${id}.jpg`);
-  const dest = join(productsDir, `${id}.jpg`);
   try {
-    await copyFile(src, dest);
-    console.log(`✓ ${id} (ai pack-shot)`);
+    if (await copyAiAsset(id, productsDir)) {
+      console.log(`✓ ${id} (ai pack-shot)`);
+    } else {
+      throw new Error("missing AI asset");
+    }
   } catch {
     failures.push({ id, error: "missing AI asset — re-generate or add pexels fallback" });
-    console.error(`✗ ${id}: missing ${src}`);
+    console.error(`✗ ${id}: missing asset in ${assetsDir}`);
   }
 }
 
