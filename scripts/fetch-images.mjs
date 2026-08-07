@@ -68,11 +68,14 @@ const aiProducts = new Set([
   "sunflower-oil",
   "cow-ghee",
   "round-containers",
+  "dishwash-liquid",
+  "hand-gloves",
+  "floor-cleaner",
   "pineapple",
   "pomegranate",
 ]);
 
-const aiCategories = new Set(["vegetables", "chicken-poultry", "seafood", "exotics-herbs"]);
+const aiCategories = new Set(["vegetables", "chicken-poultry", "seafood", "exotics-herbs", "cleaning"]);
 
 /** Verified Pexels ids for remaining SKUs — each depicts the named item. */
 const pexelsProducts = {
@@ -85,9 +88,6 @@ const pexelsProducts = {
   "paper-bags": 3941859,
   "aluminium-foil": 4039006,
   "wooden-cutlery": 3941859,
-  "dishwash-liquid": 4039006,
-  "hand-gloves": 4483324,
-  "floor-cleaner": 4039006,
 };
 
 const pexelsCategories = {
@@ -98,7 +98,6 @@ const pexelsCategories = {
   "grains-pulses": 4038738,
   "oils-ghee": 3370706,
   packaging: 4493650,
-  cleaning: 4039006,
 };
 
 function pexelsUrl(id, w, h) {
