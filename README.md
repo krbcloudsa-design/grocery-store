@@ -35,7 +35,7 @@ Other scripts:
 ```bash
 npm run build        # production build
 npm run lint         # eslint
-npm run fetch-images # download catalogue photos into public/
+npm run fetch-images # rebuild catalogue photos (AI pack-shots + Pexels stock)
 npx tsc --noEmit     # typecheck
 ```
 
@@ -58,10 +58,14 @@ src/
     types.ts                 shared types
 ```
 
+## Product photos
+
+Key SKUs (meat, seafood, dairy, spices, staples) use **AI-generated pack shots** — one prompt per product id so the image matches the catalogue name. Remaining produce and packaging items use **verified Pexels stock**. Run `npm run fetch-images` to rebuild `public/products/` and `public/categories/`.
+
 ## Next steps
 
 - Real backend: Postgres catalogue, live pricing per city, stock levels.
 - Restaurant accounts with GSTIN verification and credit limits.
 - Downloadable GST invoices and credit notes.
 - Order tracking with vehicle status and delivery OTP.
-- Replace stock photos with your own product photography per SKU.
+- Replace generated/stock photos with your own SKU photography from your suppliers.
