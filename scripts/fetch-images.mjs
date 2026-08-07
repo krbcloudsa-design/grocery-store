@@ -64,6 +64,8 @@ const aiProducts = new Set([
   "sunflower-oil",
   "cow-ghee",
   "round-containers",
+  "pineapple",
+  "pomegranate",
 ]);
 
 const aiCategories = new Set(["vegetables", "chicken-poultry", "seafood", "exotics-herbs"]);
@@ -74,8 +76,6 @@ const pexelsProducts = {
   "cucumber": 2329440,
   "lemon": 1414125,
   "banana-robusta": 61127,
-  "pineapple": 1125774,
-  "pomegranate": 1407305,
   "apple-shimla": 102104,
   "chicken-salami": 604969,
   "sona-masoori": 4038738,
