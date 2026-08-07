@@ -30,6 +30,12 @@ const aiProducts = new Set([
   "palak",
   "capsicum-green",
   "cauliflower",
+  "broccoli",
+  "zucchini",
+  "iceberg-lettuce",
+  "basil",
+  "rosemary",
+  "mushroom-button",
   "green-chilli",
   "chicken-curry-cut",
   "chicken-boneless",
@@ -58,7 +64,7 @@ const aiProducts = new Set([
   "round-containers",
 ]);
 
-const aiCategories = new Set(["vegetables", "chicken-poultry", "seafood"]);
+const aiCategories = new Set(["vegetables", "chicken-poultry", "seafood", "exotics-herbs"]);
 
 /** Verified Pexels ids for remaining SKUs — each depicts the named item. */
 const pexelsProducts = {
@@ -69,12 +75,6 @@ const pexelsProducts = {
   "pineapple": 1125774,
   "pomegranate": 1407305,
   "apple-shimla": 102104,
-  "broccoli": 4750386,
-  "zucchini": 1592842,
-  "iceberg-lettuce": 1199957,
-  "basil": 1132047,
-  "rosemary": 4750386,
-  "mushroom-button": 547115,
   "chicken-salami": 604969,
   "mozzarella": 821007,
   "amul-butter": 248412,
@@ -92,7 +92,6 @@ const pexelsProducts = {
 
 const pexelsCategories = {
   fruits: 61127,
-  "exotics-herbs": 1132047,
   "mutton-meat": 769289,
   dairy: 4109111,
   "masalas-spices": 928274,
