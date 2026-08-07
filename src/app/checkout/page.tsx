@@ -112,7 +112,7 @@ export default function CheckoutPage() {
     };
 
     placeOrder(order);
-    router.push(`/orders/${order.id}`);
+    router.push(`/orders?id=${order.id}`);
   }
 
   const inputClass =

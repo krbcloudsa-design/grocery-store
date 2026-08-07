@@ -1,12 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useMemo } from "react";
 import { ProductCard } from "@/components/product-card";
 import { categories, searchProducts } from "@/lib/catalog";
 
-export default async function SearchPage({ searchParams }: PageProps<"/search">) {
-  const { q } = await searchParams;
-  const query = typeof q === "string" ? q : "";
-  const results = searchProducts(query);
+function SearchResults() {
+  const params = useSearchParams();
+  const query = params.get("q") ?? "";
+  const results = useMemo(() => searchProducts(query), [query]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -57,5 +61,13 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-7xl px-4 py-20 text-center text-ink-500">Loading…</div>}>
+      <SearchResults />
+    </Suspense>
   );
 }
