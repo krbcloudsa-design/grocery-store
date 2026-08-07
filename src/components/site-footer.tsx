@@ -52,7 +52,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>Returns &amp; credit notes</li>
-            <li>080-0000-0000 (7 AM - 10 PM)</li>
+            <li>
+              <a href="tel:+919856474743" className="hover:text-brand-300">
+                98564 74743 (7 AM - 10 PM)
+              </a>
+            </li>
             <li>care@rasoidirect.in</li>
           </ul>
         </div>

@@ -52,8 +52,8 @@ export function SiteHeader() {
           <p>Serving Bengaluru, Mumbai, Delhi NCR, Hyderabad and Pune</p>
           <div className="hidden gap-4 sm:flex">
             <span>Next-day delivery before 9 AM</span>
-            <a href="tel:+918000000000" className="hover:text-brand-300">
-              Support 080-0000-0000
+            <a href="tel:+919856474743" className="hover:text-brand-300">
+              Support 98564 74743
             </a>
           </div>
         </div>
