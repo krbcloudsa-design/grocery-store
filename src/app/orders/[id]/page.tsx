@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart";
@@ -69,8 +70,8 @@ export default function OrderDetailPage() {
         <ul className="divide-y divide-ink-100">
           {order.items.map((item) => (
             <li key={item.productId} className="flex items-center gap-4 px-5 py-3">
-              <span className="grid h-10 w-10 place-items-center rounded-lg bg-ink-50 text-xl" aria-hidden>
-                {item.emoji}
+              <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-ink-100 bg-white">
+                <Image src={item.image} alt="" fill sizes="48px" className="object-cover" />
               </span>
               <div className="min-w-0 flex-1">
                 <Link

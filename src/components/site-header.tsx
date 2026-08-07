@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -135,7 +136,15 @@ export function SiteHeader() {
                   onClick={() => setOpenNav(false)}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-700 transition hover:bg-white"
                 >
-                  <span aria-hidden>{category.emoji}</span>
+                  <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-md border border-ink-100">
+                    <Image
+                      src={category.image}
+                      alt=""
+                      fill
+                      sizes="28px"
+                      className="object-cover"
+                    />
+                  </span>
                   {category.name}
                 </Link>
               ))}

@@ -33,9 +33,10 @@ Open http://localhost:3000.
 Other scripts:
 
 ```bash
-npm run build   # production build
-npm run lint    # eslint
-npx tsc --noEmit  # typecheck
+npm run build        # production build
+npm run lint         # eslint
+npm run fetch-images # download catalogue photos into public/
+npx tsc --noEmit     # typecheck
 ```
 
 ## Project layout
@@ -63,4 +64,4 @@ src/
 - Restaurant accounts with GSTIN verification and credit limits.
 - Downloadable GST invoices and credit notes.
 - Order tracking with vehicle status and delivery OTP.
-- Product photography in place of the current emoji tiles.
+- Replace stock photos with your own product photography per SKU.

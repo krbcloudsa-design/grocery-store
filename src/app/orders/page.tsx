@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/cart";
 import { formatINR } from "@/lib/format";
@@ -43,10 +44,9 @@ export default function OrdersPage() {
                   {order.items.slice(0, 4).map((item) => (
                     <span
                       key={item.productId}
-                      className="grid h-10 w-10 place-items-center rounded-full border-2 border-white bg-ink-50 text-lg"
-                      aria-hidden
+                      className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-white bg-ink-50"
                     >
-                      {item.emoji}
+                      <Image src={item.image} alt="" fill sizes="40px" className="object-cover" />
                     </span>
                   ))}
                 </div>

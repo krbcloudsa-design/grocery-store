@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -56,16 +57,26 @@ export default function CategoryPage() {
         / <span className="text-ink-800">{category.name}</span>
       </nav>
 
-      <div
-        className={`mt-3 rounded-2xl border border-ink-100 bg-gradient-to-br ${category.gradient} px-6 py-7`}
-      >
-        <div className="flex items-center gap-4">
-          <span className="text-4xl" aria-hidden>
-            {category.emoji}
-          </span>
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-ink-900">{category.name}</h1>
-            <p className="text-sm text-ink-600">{category.tagline}</p>
+      <div className="relative mt-3 overflow-hidden rounded-2xl border border-ink-100">
+        <div className="relative h-44 sm:h-52">
+          <Image
+            src={category.image}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 1280px"
+            className="object-cover"
+          />
+          <div
+            className={`absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-transparent`}
+          />
+          <div className="absolute inset-0 flex items-end p-6 sm:items-center">
+            <div>
+              <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                {category.name}
+              </h1>
+              <p className="mt-1 text-sm text-white/85">{category.tagline}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -119,9 +130,18 @@ export default function CategoryPage() {
                   <li key={entry.slug}>
                     <Link
                       href={`/category/${entry.slug}`}
-                      className="text-sm text-ink-600 hover:text-brand-700"
+                      className="flex items-center gap-2 text-sm text-ink-600 hover:text-brand-700"
                     >
-                      {entry.emoji} {entry.name}
+                      <span className="relative h-6 w-6 shrink-0 overflow-hidden rounded-md border border-ink-100">
+                        <Image
+                          src={entry.image}
+                          alt=""
+                          fill
+                          sizes="24px"
+                          className="object-cover"
+                        />
+                      </span>
+                      {entry.name}
                     </Link>
                   </li>
                 ))}

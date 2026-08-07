@@ -2,7 +2,8 @@ export type Category = {
   slug: string;
   name: string;
   tagline: string;
-  emoji: string;
+  /** Hero / tile photo served from /public/categories. */
+  image: string;
   gradient: string;
   subcategories: string[];
 };
@@ -13,7 +14,8 @@ export type Product = {
   localName?: string;
   category: string;
   subcategory: string;
-  emoji: string;
+  /** Catalogue photo served from /public/products. */
+  image: string;
   /** Sold-as description, e.g. "1 kg pack" or "Crate of 10 kg". */
   packSize: string;
   /** Unit shown next to the price, e.g. "kg", "pc", "ltr". */
@@ -42,7 +44,7 @@ export type CartLine = {
 export type OrderItem = {
   productId: string;
   name: string;
-  emoji: string;
+  image: string;
   qty: number;
   unit: string;
   unitPrice: number;

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
 import { bestsellers, categories, productsByCategory } from "@/lib/catalog";
@@ -99,8 +100,14 @@ export default function HomePage() {
             <ul className="mt-4 divide-y divide-ink-100">
               {[...vegetables.slice(0, 3), ...meat.slice(0, 2)].map((product) => (
                 <li key={product.id} className="flex items-center gap-3 py-3">
-                  <span className="grid h-10 w-10 place-items-center rounded-lg bg-ink-50 text-xl" aria-hidden>
-                    {product.emoji}
+                  <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-ink-100 bg-white">
+                    <Image
+                      src={product.image}
+                      alt=""
+                      fill
+                      sizes="44px"
+                      className="object-cover"
+                    />
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-ink-900">{product.name}</p>
@@ -156,15 +163,26 @@ export default function HomePage() {
             <Link
               key={category.slug}
               href={`/category/${category.slug}`}
-              className={`group rounded-xl border border-ink-100 bg-gradient-to-br ${category.gradient} p-4 transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md`}
+              className="group overflow-hidden rounded-xl border border-ink-100 bg-white transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
             >
-              <span className="text-3xl" aria-hidden>
-                {category.emoji}
-              </span>
-              <h3 className="mt-3 text-sm font-bold text-ink-900">{category.name}</h3>
-              <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-ink-600">
-                {category.tagline}
-              </p>
+              <div className="relative h-24 overflow-hidden">
+                <Image
+                  src={category.image}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 180px"
+                  className="object-cover transition duration-300 group-hover:scale-105"
+                />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-30 mix-blend-multiply`}
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="text-sm font-bold text-ink-900">{category.name}</h3>
+                <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-ink-600">
+                  {category.tagline}
+                </p>
+              </div>
             </Link>
           ))}
         </div>

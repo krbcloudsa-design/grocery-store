@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { QtyStepper } from "@/components/qty-stepper";
 import { discountPercent, formatINR } from "@/lib/format";
@@ -9,8 +10,16 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border border-ink-100 bg-white transition hover:border-brand-200 hover:shadow-lg hover:shadow-brand-900/5">
       <Link href={`/product/${product.id}`} className="block">
-        <div className="relative flex h-32 items-center justify-center bg-gradient-to-br from-ink-50 to-white text-5xl">
-          <span aria-hidden>{product.emoji}</span>
+        <div className="relative h-36 overflow-hidden bg-white">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 220px"
+            className={`object-cover transition duration-300 group-hover:scale-105 ${
+              product.inStock ? "" : "grayscale"
+            }`}
+          />
           {off > 0 && (
             <span className="absolute left-2 top-2 rounded-md bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
               {off}% OFF

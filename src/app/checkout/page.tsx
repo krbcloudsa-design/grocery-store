@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -87,7 +88,7 @@ export default function CheckoutPage() {
         {
           productId: product.id,
           name: product.name,
-          emoji: product.emoji,
+          image: product.image,
           qty: line.qty,
           unit: product.unit,
           unitPrice,
@@ -296,8 +297,14 @@ export default function CheckoutPage() {
               const unitPrice = effectivePrice(product, line.qty);
               return (
                 <li key={line.productId} className="flex items-center gap-3 text-sm">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-ink-50" aria-hidden>
-                    {product.emoji}
+                  <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-ink-100 bg-white">
+                    <Image
+                      src={product.image}
+                      alt=""
+                      fill
+                      sizes="40px"
+                      className="object-cover"
+                    />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium text-ink-900">{product.name}</span>

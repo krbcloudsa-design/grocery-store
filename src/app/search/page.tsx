@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
 import { categories, searchProducts } from "@/lib/catalog";
@@ -38,9 +39,18 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
               <Link
                 key={category.slug}
                 href={`/category/${category.slug}`}
-                className="rounded-full border border-ink-200 bg-white px-3 py-1.5 text-sm text-ink-700 transition hover:border-brand-300 hover:text-brand-700"
+                className="flex items-center gap-2 rounded-full border border-ink-200 bg-white py-1.5 pl-1.5 pr-3 text-sm text-ink-700 transition hover:border-brand-300 hover:text-brand-700"
               >
-                {category.emoji} {category.name}
+                <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full border border-ink-100">
+                  <Image
+                    src={category.image}
+                    alt=""
+                    fill
+                    sizes="28px"
+                    className="object-cover"
+                  />
+                </span>
+                {category.name}
               </Link>
             ))}
           </div>

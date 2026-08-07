@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { effectivePrice, productById } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
@@ -59,9 +60,15 @@ export default function CartPage() {
               <div key={line.productId} className="flex gap-4 p-4">
                 <Link
                   href={`/product/${product.id}`}
-                  className="grid h-16 w-16 shrink-0 place-items-center rounded-xl bg-ink-50 text-3xl"
+                  className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-ink-100 bg-white"
                 >
-                  <span aria-hidden>{product.emoji}</span>
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
                 </Link>
 
                 <div className="min-w-0 flex-1">

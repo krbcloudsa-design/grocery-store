@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
@@ -56,12 +57,15 @@ export default function ProductPage() {
 
       <div className="mt-4 grid gap-8 lg:grid-cols-[420px_1fr]">
         <div>
-          <div
-            className={`grid h-80 place-items-center rounded-2xl border border-ink-100 bg-gradient-to-br ${
-              category?.gradient ?? "from-ink-50 to-white"
-            } text-8xl`}
-          >
-            <span aria-hidden>{product.emoji}</span>
+          <div className="relative h-80 overflow-hidden rounded-2xl border border-ink-100 bg-white">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 420px"
+              className="object-cover"
+            />
           </div>
           <div className="mt-3 grid grid-cols-3 gap-3 text-center text-[11px] text-ink-600">
             <div className="rounded-lg border border-ink-100 p-2">
