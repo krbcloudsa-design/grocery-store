@@ -75,7 +75,7 @@ const aiProducts = new Set([
   "pomegranate",
 ]);
 
-const aiCategories = new Set(["vegetables", "chicken-poultry", "seafood", "exotics-herbs", "cleaning"]);
+const aiCategories = new Set(["vegetables", "chicken-poultry", "seafood", "exotics-herbs", "cleaning", "grains-pulses"]);
 
 /** Verified Pexels ids for remaining SKUs — each depicts the named item. */
 const pexelsProducts = {
@@ -95,7 +95,6 @@ const pexelsCategories = {
   "mutton-meat": 769289,
   dairy: 4109111,
   "masalas-spices": 928274,
-  "grains-pulses": 4038738,
   "oils-ghee": 3370706,
   packaging: 4493650,
 };
