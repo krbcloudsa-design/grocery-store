@@ -28,6 +28,8 @@ const aiProducts = new Set([
   "garlic-peeled",
   "coriander-leaves",
   "palak",
+  "capsicum-green",
+  "cauliflower",
   "green-chilli",
   "chicken-curry-cut",
   "chicken-boneless",
@@ -60,8 +62,6 @@ const aiCategories = new Set(["vegetables", "chicken-poultry", "seafood"]);
 
 /** Verified Pexels ids for remaining SKUs — each depicts the named item. */
 const pexelsProducts = {
-  "capsicum-green": 1435901,
-  "cauliflower": 1300975,
   "bottle-gourd": 1435904,
   "cucumber": 2329440,
   "lemon": 1414125,
