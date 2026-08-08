@@ -7,11 +7,12 @@ import { useMemo, useState } from "react";
 import { effectivePrice, productById } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { MIN_ORDER_VALUE, deliverySlots, formatINR } from "@/lib/format";
+import { loadRazorpayScript } from "@/lib/razorpay-client";
 import type { Order } from "@/lib/types";
 
 const paymentMethods = [
+  { id: "online", label: "Pay online (Card / UPI / Netbanking)", note: "Secured by Razorpay" },
   { id: "credit", label: "Pay on credit (7 days)", note: "Approved outlets only" },
-  { id: "upi", label: "UPI / Netbanking", note: "Instant confirmation" },
   { id: "cod", label: "Pay on delivery", note: "Cash or card at the gate" },
 ];
 
@@ -36,6 +37,7 @@ export default function CheckoutPage() {
   const [payment, setPayment] = useState(paymentMethods[0].id);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [payError, setPayError] = useState("");
 
   const field = (key: keyof typeof emptyOutlet) => ({
     value: outlet[key],
@@ -75,11 +77,7 @@ export default function CheckoutPage() {
     return Object.keys(next).length === 0;
   }
 
-  function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    if (!validate()) return;
-    setSubmitting(true);
-
+  function buildOrder(paymentMethod: string, paymentId?: string): Order {
     const items = lines.flatMap((line) => {
       const product = productById(line.productId);
       if (!product) return [];
@@ -97,7 +95,7 @@ export default function CheckoutPage() {
       ];
     });
 
-    const order: Order = {
+    return {
       id: `RD${Date.now().toString().slice(-8)}`,
       placedAt: new Date().toISOString(),
       items,
@@ -106,13 +104,94 @@ export default function CheckoutPage() {
       deliveryFee,
       total,
       slot: slots.find((entry) => entry.id === slot)?.label ?? slots[0].label,
-      paymentMethod: paymentMethods.find((entry) => entry.id === payment)?.label ?? "",
+      paymentMethod,
+      paymentId,
       outlet: { ...outlet, gstin: outlet.gstin.toUpperCase() },
       status: "Confirmed",
     };
+  }
 
-    placeOrder(order);
+  async function payWithRazorpay(order: Order) {
+    const scriptReady = await loadRazorpayScript();
+    if (!scriptReady || !window.Razorpay) {
+      throw new Error("Could not load Razorpay checkout. Check your internet connection.");
+    }
+
+    const response = await fetch("/api/razorpay/order/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: order.total, receipt: order.id }),
+    });
+
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.error ?? "Could not start payment");
+    }
+
+    await new Promise<void>((resolve, reject) => {
+      const checkout = new window.Razorpay!({
+        key: payload.keyId,
+        amount: payload.amount,
+        currency: payload.currency,
+        name: "RasoiDirect",
+        description: `Indent ${order.id}`,
+        order_id: payload.orderId,
+        prefill: {
+          name: order.outlet.contactName,
+          contact: order.outlet.phone,
+        },
+        theme: { color: "#16a34a" },
+        handler: async (paymentResponse) => {
+          try {
+            const verifyRes = await fetch("/api/razorpay/verify/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(paymentResponse),
+            });
+            const verifyPayload = await verifyRes.json();
+            if (!verifyRes.ok || !verifyPayload.verified) {
+              reject(new Error(verifyPayload.error ?? "Payment verification failed"));
+              return;
+            }
+            placeOrder({ ...order, paymentId: verifyPayload.paymentId });
+            resolve();
+          } catch (err) {
+            reject(err instanceof Error ? err : new Error("Payment verification failed"));
+          }
+        },
+        modal: {
+          ondismiss: () => reject(new Error("Payment cancelled")),
+        },
+      });
+      checkout.open();
+    });
+
     router.push(`/orders?id=${order.id}`);
+  }
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!validate()) return;
+
+    setPayError("");
+    setSubmitting(true);
+
+    const methodLabel = paymentMethods.find((entry) => entry.id === payment)?.label ?? "";
+
+    try {
+      if (payment === "online") {
+        const order = buildOrder(methodLabel);
+        await payWithRazorpay(order);
+      } else {
+        const order = buildOrder(methodLabel);
+        placeOrder(order);
+        router.push(`/orders?id=${order.id}`);
+      }
+    } catch (err) {
+      setPayError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const inputClass =
@@ -285,6 +364,13 @@ export default function CheckoutPage() {
                 </label>
               ))}
             </div>
+            {payment === "online" && (
+              <p className="mt-3 text-xs leading-relaxed text-ink-500">
+                Online payments are processed by Razorpay. Money settles to the bank account linked
+                in your Razorpay merchant dashboard — card and UPI details are entered on
+                Razorpay&apos;s secure page, not on this site.
+              </p>
+            )}
           </section>
         </div>
 
@@ -341,15 +427,29 @@ export default function CheckoutPage() {
             </div>
           </dl>
 
+          {payError && (
+            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              {payError}
+            </p>
+          )}
+
           <button
             type="submit"
             disabled={submitting}
             className="mt-5 w-full cursor-pointer rounded-lg bg-brand-600 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-ink-200"
           >
-            {submitting ? "Placing order…" : `Place order · ${formatINR(total)}`}
+            {submitting
+              ? payment === "online"
+                ? "Opening payment…"
+                : "Placing order…"
+              : payment === "online"
+                ? `Pay ${formatINR(total)}`
+                : `Place order · ${formatINR(total)}`}
           </button>
           <p className="mt-2 text-center text-[11px] text-ink-400">
-            Demo checkout — no real payment is collected.
+            {payment === "online"
+              ? "Secured checkout via Razorpay"
+              : "No online payment — order is booked on account or COD"}
           </p>
         </aside>
       </form>

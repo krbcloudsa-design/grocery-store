@@ -29,14 +29,14 @@ const categorySeeds: CategorySeed[] = [
     name: "Chicken & Poultry",
     tagline: "Cut to your spec, cold-chain delivered",
     gradient: "from-rose-100 to-orange-50",
-    subcategories: ["Curry Cuts", "Boneless", "Speciality", "Eggs"],
+    subcategories: ["Curry Cuts", "Boneless", "Speciality", "Cold Cuts", "Eggs"],
   },
   {
     slug: "mutton-meat",
     name: "Mutton & Meat",
     tagline: "Halal certified, hand-selected",
     gradient: "from-red-100 to-rose-50",
-    subcategories: ["Mutton", "Lamb", "Cold Cuts"],
+    subcategories: ["Mutton", "Lamb"],
   },
   {
     slug: "seafood",
@@ -766,7 +766,7 @@ const seeds: ProductSeed[] = [
   p({
     id: "chicken-salami",
     name: "Chicken Salami",
-    category: "mutton-meat",
+    category: "chicken-poultry",
     subcategory: "Cold Cuts",
     packSize: "500 g pack",
     unit: "pack",

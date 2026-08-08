@@ -61,6 +61,7 @@ export type Order = {
   total: number;
   slot: string;
   paymentMethod: string;
+  paymentId?: string;
   outlet: {
     businessName: string;
     contactName: string;

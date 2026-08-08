@@ -65,6 +65,9 @@ function OrderDetail({ orderId }: { orderId: string }) {
           </div>
         ))}
       </div>
+      {order.paymentId && (
+        <p className="mt-3 text-xs text-ink-500">Razorpay payment ref: {order.paymentId}</p>
+      )}
 
       <section className="mt-6 rounded-2xl border border-ink-100">
         <h2 className="border-b border-ink-100 px-5 py-4 text-sm font-bold uppercase tracking-wide text-ink-500">
